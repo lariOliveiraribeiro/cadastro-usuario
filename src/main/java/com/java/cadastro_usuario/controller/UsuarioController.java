@@ -3,6 +3,7 @@ package com.java.cadastro_usuario.controller;
 import com.java.cadastro_usuario.business.UsuarioService;
 import com.java.cadastro_usuario.infrastructere.entitys.Usuario;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +15,23 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Void> salvarUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> salvarUsuario(@RequestBody Usuario usuario) {
         usuarioService.salvarUsuario(usuario);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
     @GetMapping
     public ResponseEntity<Usuario> buscarUsuarioPorEmail(@RequestParam String email) {
-        return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
 
+        Usuario usuario = usuarioService.buscarUsuarioPorEmail(email);
+
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(usuario);
     }
+
 
     @DeleteMapping
     public ResponseEntity<Void> deletarUsuarioPorEmail(@RequestParam String email) {
